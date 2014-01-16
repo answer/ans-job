@@ -44,7 +44,12 @@ Or install it yourself as:
 
     class MyJob < ApplicationJob
       def perform_with_lock
-        raise "runtime error"
+        total = 10
+        total.times do |current|
+          # resque-status の進捗設定メソッド
+          at current, total, "progress: #{current}/#{total}"
+        end
+        raise "runtime error" # => 例外は on_failure で処理
       end
     end
 
@@ -56,6 +61,10 @@ Or install it yourself as:
 
     MyJob.perform # => puts "runtime error"
     MyJobNoLock.perform # => puts "runtime error"
+
+
+resque-status の進捗メソッドを使用すると、 resque 管理画面でパーセント表示が進む  
+呼び出さなくても完了したかどうかはわかるので、パーセント表示が見たい場合以外はやらなくても問題ない
 
 
 ## Spec
