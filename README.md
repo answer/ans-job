@@ -74,7 +74,7 @@ resque-status の進捗メソッドを使用すると、 resque 管理画面で�
 * `perform_with_lock` メソッドを定義するとロックしつつ作業を行う  
   タイムアウト秒は `lock_timeout` メソッドを定義することでオーバーライドできる
 * ロックを望まない場合、 `perform_without_lock` メソッドを定義する  
-  `perform_with_lock` と `perform_without_lock` の両方を定義した場合、 `perform_without_lock` が優先される
+  `perform_with_lock` と `perform_without_lock` の両方を定義した場合、 `perform_without_lock` が優先され、 `perform_with_lock` は呼び出されない
 
 ## Setting
 
