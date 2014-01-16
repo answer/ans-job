@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["sakai@ans-web.co.jp"]
   spec.description   = %q{resque 用 job の基底クラスに include する}
   spec.summary       = %q{job 基本メソッドを提供}
-  spec.homepage      = "job 基本メソッドを提供:://github.com/answer/ans-job"
+  spec.homepage      = "https://github.com/answer/ans-job"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files`.split($/)
@@ -20,4 +20,7 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "bundler", "~> 1.3"
   spec.add_development_dependency "rake"
+
+  spec.add_dependency "resque-status"
+  spec.add_dependency "redis-objects"
 end

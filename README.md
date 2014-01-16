@@ -4,6 +4,12 @@ job の基本メソッドを提供
 
 resque 用 job クラスの基底クラスに include する
 
+resque-status も include される
+
+resque 2.0 には対応していない
+
+Redis::Lock により、ロックしつつメソッドを呼び出す
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -20,40 +26,52 @@ Or install it yourself as:
 
 ## Usage
 
+    # config/initializers/resque-status.rb
+    require "resque/status"
+    Resque::Plugins::Status::Hash.expire_in = 24.hours # 24hrs in seconds
+
     # app/jobs/application_job.rb
     class ApplicationJob
       include Ans::Job
 
-      def handle_standard_error(e)
-        # メールを送信、等
+      def on_failure(e)
         puts e.message
+
+        # 実際はメールを送信、等の処理を行う
+        #ExceptionNotifier::Notifier.background_exception_notification(e).deliver
       end
     end
 
     class MyJob < ApplicationJob
-      def perform
+      def perform_with_lock
+        raise "runtime error"
+      end
+    end
+
+    class MyJobNoLock < ApplicationJob
+      def perform_without_lock
         raise "runtime error"
       end
     end
 
     MyJob.perform # => puts "runtime error"
+    MyJobNoLock.perform # => puts "runtime error"
 
-`Ans::Job` を `include` したクラスを継承すると、 `self.perform` メソッドが定義される  
-`self.perform` メソッドは、 `Redis::Lock` によってロックしつつ、自分を new して `perform` メソッドを呼び出す  
-発生した `StandardError` は `self.perform` で `rescue` され、 `handle_standard_error` をコールする
+
+## Spec
+
+* Ans::Job を include すると、 Resque::Plugins::Status が include される
+* initialize, perform, self.perform メソッドは定義しないように
+* `perform_with_lock` メソッドを定義するとロックしつつ作業を行う  
+  タイムアウト秒は `lock_timeout` メソッドを定義することでオーバーライドできる
+* ロックを望まない場合、 `perform_without_lock` メソッドを定義する  
+  `perform_with_lock` と `perform_without_lock` の両方を定義した場合、 `perform_without_lock` が優先される
 
 ## Setting
 
-    # config/initializers/ans-job.rb
-    Ans::Job.configure do |config|
-      config.perform_method_name = :perform
-      config.handle_standard_error_method_name = :handle_standard_error
-    end
-
     class MyJob < ApplicationJob
-      configure do |config|
-        config.is_lock = false # Redis::Lock でロックするか？
-        config.lock_timeout = 0.5 # Redis::Lock のタイムアウト秒
+      def lock_timeout
+        0.1 # Redis::Lock のタイムアウト秒
       end
     end
 
