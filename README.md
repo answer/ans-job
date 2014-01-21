@@ -29,6 +29,9 @@ Or install it yourself as:
     # config/initializers/resque-status.rb
     require "resque/status"
     Resque::Plugins::Status::Hash.expire_in = 24.hours # 24hrs in seconds
+    Ans::Job.configure do |config|
+      config.lock_namespace = Resque.redis.namespace
+    end
 
     # app/jobs/application_job.rb
     class ApplicationJob

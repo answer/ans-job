@@ -2,6 +2,12 @@ require "ans/job/version"
 
 module Ans
   module Job
+    include ActiveSupport::Configurable
+
+    configure do |config|
+      config.lock_namespace = ""
+    end
+
     def self.included(mod)
       require "resque/status"
       require "redis/objects"
@@ -28,7 +34,7 @@ module Ans
     private
 
     def lock_key
-      self.class.to_s
+      "#{Ans::Job.config.lock_namespace}#{self.class.to_s}"
     end
     def lock_timeout
       0.1
