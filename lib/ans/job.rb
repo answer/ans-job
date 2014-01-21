@@ -19,13 +19,13 @@ module Ans
       end
     end
 
-    private
-
     def on_success
       if respond_to?(:remove_on_success?) && remove_on_success?
         Resque::Plugins::Status::Hash.remove(uuid)
       end
     end
+
+    private
 
     def lock_key
       self.class.to_s
