@@ -70,17 +70,21 @@ resque-status の進捗メソッドを使用すると、 resque 管理画面で�
 ## Spec
 
 * Ans::Job を include すると、 Resque::Plugins::Status が include される
-* initialize, perform, self.perform メソッドは定義しないように
+* `initialize`, `perform`, `on_success`, `self.perform` メソッドは定義しないように
 * `perform_with_lock` メソッドを定義するとロックしつつ作業を行う  
   タイムアウト秒は `lock_timeout` メソッドを定義することでオーバーライドできる
 * ロックを望まない場合、 `perform_without_lock` メソッドを定義する  
   `perform_with_lock` と `perform_without_lock` の両方を定義した場合、 `perform_without_lock` が優先され、 `perform_with_lock` は呼び出されない
+* `remove_on_success?` が true を返す場合、完了時にステータスが削除される
 
 ## Setting
 
     class MyJob < ApplicationJob
       def lock_timeout
         0.1 # Redis::Lock のタイムアウト秒
+      end
+      def remove_on_success?
+        false # 成功時にステータスを削除する場合は true を返す
       end
     end
 
