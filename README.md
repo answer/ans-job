@@ -89,6 +89,12 @@ resque-status の進捗メソッドを使用すると、 resque 管理画面で�
       def remove_on_success?
         false # 成功時にステータスを削除する場合は true を返す
       end
+      def lock_key_suffix
+        "" # lock_key に追加する文字列
+        # 複数のホストで worker を走らせる場合、ホスト名的なものを追加することでロックが頻発するのを防ぐ
+        # デフォルトでそうしないのは、複数のホストで実行したくない場合はロックされてほしいから
+        # 複数のホストで実行することを想定している場合、ここでホスト名を返す
+      end
     end
 
 ## Contributing

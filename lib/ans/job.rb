@@ -34,7 +34,8 @@ module Ans
     private
 
     def lock_key
-      "#{Ans::Job.config.lock_namespace}#{self.class.to_s}"
+      suffix = lock_key_suffix if respond_to?(:lock_key_suffix)
+      "#{Ans::Job.config.lock_namespace}#{self.class.to_s}#{suffix}"
     end
     def lock_timeout
       0.1
